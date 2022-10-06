@@ -10,6 +10,10 @@ from django.contrib.auth.decorators import login_required
 
 from wishlist.models import BarangWishlist
 
+# Referensi Lab 5:
+# 1. https://api.jquery.com/id-selector/
+# 2. https://stackoverflow.com/questions/1960240/jquery-ajax-submit-form
+
 # Create your views here.
 @login_required(login_url='/wishlist/login/')
 def show_wishlist(request):
@@ -21,6 +25,27 @@ def show_wishlist(request):
     }
     
     return render(request, "wishlist.html", context)
+
+@login_required(login_url='/wishlist/login/')
+def show_wishlist_ajax(request):
+    context = {
+        'nama': 'Emir Shamsuddin Fadhlurrahman',
+        'last_login': request.COOKIES['last_login'],
+    }
+    
+    return render(request, "wishlist_ajax.html", context)
+
+@login_required(login_url='/wishlist/login/')
+def post_wishlist(request):
+    if request.method == 'POST':
+        nama_barang = request.POST.get('nama_barang');
+        harga_barang = request.POST.get('harga_barang');
+        deskripsi = request.POST.get('deskripsi');
+        
+        BarangWishlist.objects.create(nama_barang=nama_barang, harga_barang=harga_barang, deskripsi=deskripsi);
+    
+    data = BarangWishlist.objects.all()
+    return HttpResponse(serializers.serialize('json', data), content_type='application/json')
 
 def show_xml(request):
     data = BarangWishlist.objects.all()
